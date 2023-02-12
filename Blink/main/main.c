@@ -2,6 +2,17 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "esp_random.h"
+
+#define RANDOM "RANDOM"
+
+int dice_role()
+{
+    long int random = esp_random();
+    int posNumber = abs(random);
+    int diceNumber = posNumber%20;
+    return diceNumber;
+}
 
 void app_main(void)
 {
@@ -27,6 +38,8 @@ void app_main(void)
     while (1)
     {
         ESP_LOGI("INF", "loopCount value is %d",loopCount++);
+        ESP_LOGI(RANDOM, "The random number is %d",dice_role());
+
         vTaskDelay(1000/portTICK_PERIOD_MS);                    //1 second delay
     }
     
