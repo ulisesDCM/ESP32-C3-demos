@@ -3,8 +3,10 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_random.h"
+#include "driver/gpio.h"
 
 #define RANDOM "RANDOM"
+#define LED_PIN 8
 
 int dice_role()
 {
@@ -16,7 +18,7 @@ int dice_role()
 
 void app_main(void)
 {
-    //TAG
+    //Minimum TAG
     esp_log_level_set("LOG", ESP_LOG_INFO);
 
     //Log messages.
@@ -34,12 +36,23 @@ void app_main(void)
     ESP_LOGV("VERBOSE","This is a verbose!!! %d",number++);
 
     uint16_t loopCount = 0;
+    
+    //Init the GPIO pin to control the RGB LED.
+    uint32_t ledState =0;
+    gpio_reset_pin(LED_PIN);
+    gpio_set_direction(LED_PIN, GPIO_MODE_OUTPUT);
 
     while (1)
     {
         ESP_LOGI("INF", "loopCount value is %d",loopCount++);
         ESP_LOGI(RANDOM, "The random number is %d",dice_role());
 
+        //Toogle LED.
+        ledState = !ledState;
+        gpio_set_level(LED_PIN, ledState); 
+        ESP_LOGI("INF","ledState value is %ld",ledState);
+    
+        //Main loop delay.
         vTaskDelay(1000/portTICK_PERIOD_MS);                    //1 second delay
     }
     
