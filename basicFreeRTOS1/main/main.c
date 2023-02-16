@@ -4,9 +4,10 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "test1/test1.h"
+#include "test1.h"		//Test component inside of the src folder.
+#include "myGPIO.h"		//Test component outside of the src folder.
 
-#define LOG_MAIN_TAG		"main.c"
+#define LOG_TAG_MAIN		"main.c"
 
 void app_main(void)
 {
@@ -15,7 +16,8 @@ void app_main(void)
 	while(1)
 	{
 		test_sum(x,y);
-		ESP_LOGI(LOG_MAIN_TAG, "%d + %d = %d",x,y,test_sum(x, y));
+		ESP_LOGI(LOG_TAG_MAIN, "%d + %d = %d",x,y,test_sum(x, y));
+
 		x++;
 		y++;
 		vTaskDelay(1000/ portTICK_PERIOD_MS);
