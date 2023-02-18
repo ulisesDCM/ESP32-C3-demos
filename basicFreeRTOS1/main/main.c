@@ -4,8 +4,9 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 
-#include "test1.h"		//Test component inside of the src folder.
-#include "myGPIO.h"		//Test component outside of the src folder.
+#include "test1.h"						//Test component inside of the src folder.
+#include "myGPIO.h"						//Test component outside of the src folder.
+#include "externalComponentTest.h"		//Test external component
 
 #define LOG_TAG_MAIN		"main.c"
 
@@ -17,6 +18,7 @@ void app_main(void)
 	{
 		test_sum(x,y);
 		test_my_gpio();
+		extCompTest1();
 		ESP_LOGI(LOG_TAG_MAIN, "%d + %d = %d",x,y,test_sum(x, y));
 
 		x++;
