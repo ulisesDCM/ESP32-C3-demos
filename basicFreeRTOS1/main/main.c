@@ -16,6 +16,7 @@ void app_main(void)
 	while(1)
 	{
 		test_sum(x,y);
+		test_my_gpio();
 		ESP_LOGI(LOG_TAG_MAIN, "%d + %d = %d",x,y,test_sum(x, y));
 
 		x++;
