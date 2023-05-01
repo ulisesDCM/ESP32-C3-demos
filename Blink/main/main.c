@@ -5,7 +5,6 @@
 #include "freertos/task.h"
 #include "esp_random.h"
 #include "driver/gpio.h"
-
 #define RANDOM "RANDOM"
 #define LED_PIN (1ULL<<GPIO_NUM_8)
 
