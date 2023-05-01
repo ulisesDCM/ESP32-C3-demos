@@ -78,7 +78,7 @@ void app_main(void)
     */
 
     while(1)
-    {
+    {        
         ESP_LOGI(ESP_LOG_TAG, "Running main loop");
         vTaskDelay(pdMS_TO_TICKS(500));
     }
