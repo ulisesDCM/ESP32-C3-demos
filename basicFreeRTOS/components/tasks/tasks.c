@@ -66,4 +66,14 @@ void task_example1(void)
                 "Running task2",
                 2,
                 NULL);
+
+    /* Call this function to create a task in the second core.
+        but for this chip (ESP32-C3) is not possible because only has
+        one core.
+        
+        xTaskCreatePinnedToCore(&task_example1_task2, "task2", 2048, "running task2", 2, NULL,0);
+        
+        Where the last parameter indicates the core that you want to execute the task 
+
+     */
 }
