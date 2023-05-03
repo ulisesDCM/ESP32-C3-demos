@@ -8,6 +8,7 @@
 #define LOG_TAG_NOTIFICATIONS   ("notifications.c")
 
 static TaskHandle_t receiveHandler = NULL;
+static TaskHandle_t receiveHandler2 = NULL;
 
 static void sender(void *params)
 {
@@ -36,11 +37,55 @@ static void receiver(void *params)
 
 void tasks_notifications_example1(void)
 {
+    ESP_LOGI(LOG_TAG_NOTIFICATIONS, "Running task notifications example 1. ");
     ESP_LOGI(LOG_TAG_NOTIFICATIONS, "Creating tasks.");
 
     /* First create the task with the notification attached. */
     xTaskCreate(&receiver,"receiver task", 1024*2, NULL, 2, &receiveHandler);   
     xTaskCreate(&sender, "sender task", 1024*2, NULL, 2, NULL);
     
+    ESP_LOGI(LOG_TAG_NOTIFICATIONS, "Finished the tasks creation, getting back to main loop.");
+}
+
+static void sender2(void *params)
+{
+    while(1)
+    {
+        ESP_LOGI(LOG_TAG_NOTIFICATIONS,"sender 2 is running");
+        xTaskNotify(receiveHandler2, (1<<0),eSetValueWithoutOverwrite);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+
+        xTaskNotify(receiveHandler2, (1<<1),eSetValueWithoutOverwrite);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        
+        xTaskNotify(receiveHandler2, (1<<2),eSetValueWithoutOverwrite);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+        
+        xTaskNotify(receiveHandler2, (1<<3),eSetValueWithoutOverwrite);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+static void receiver2(void *params)
+{
+    uint32_t sender2_state = 0;
+
+    while(1)
+    {
+        ESP_LOGI(LOG_TAG_NOTIFICATIONS, "Receiver 2 is waiting for notification...");
+        xTaskNotifyWait(0, 0, &sender2_state, portMAX_DELAY );
+        ESP_LOGI(LOG_TAG_NOTIFICATIONS, "Receiver 2 state received: %ld", sender2_state);
+    }
+}
+
+
+void tasks_notifications_example2(void)
+{
+    ESP_LOGI(LOG_TAG_NOTIFICATIONS, "Running task notifications example 2. ");
+    ESP_LOGI(LOG_TAG_NOTIFICATIONS, "Creating tasks. ");
+    
+    xTaskCreate(&receiver2, "receiver 2", 1024*2, NULL, 2, &receiveHandler2);
+    xTaskCreate(&sender2, "sender 2", 1024*2, NULL, 2, NULL);
+
     ESP_LOGI(LOG_TAG_NOTIFICATIONS, "Finished the tasks creation, getting back to main loop.");
 }
