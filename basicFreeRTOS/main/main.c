@@ -16,7 +16,7 @@ void app_main(void)
     tasks_notifications_example1(); //uncomment this line to run the task notification example.
 
     ESP_LOGI(ESP_LOG_TAG, "Running main loop");        
-
+    
     while(1)
     {
         vTaskDelay(pdMS_TO_TICKS(10000));

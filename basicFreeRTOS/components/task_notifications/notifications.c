@@ -13,17 +13,24 @@ static void sender(void *params)
 {
     while(1)
     {
-        xTaskNotifyGive(receiveHandler);
+        xTaskNotifyGive(receiveHandler);        //Notification 5.
+        xTaskNotifyGive(receiveHandler);        //Notification 4
+        xTaskNotifyGive(receiveHandler);        //Notification 3
+        xTaskNotifyGive(receiveHandler);        //Notification 2
+        xTaskNotifyGive(receiveHandler);        //Notification 1
         vTaskDelay(5000/portTICK_PERIOD_MS);
     }
 }
     
 static void receiver(void *params)
 {
+    uint32_t notification_number = 0;
+
     while(1)
     {
-        ulTaskNotifyTake(pdFALSE, portMAX_DELAY);
+        notification_number =  ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
         ESP_LOGI(LOG_TAG_NOTIFICATIONS, "recived notification");
+        ESP_LOGI(LOG_TAG_NOTIFICATIONS, "notification number: %ld",notification_number);
     }
 }
 
