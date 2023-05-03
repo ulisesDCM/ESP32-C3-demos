@@ -2,6 +2,8 @@
 #include <stdio.h>
 
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #define LOG_TAG_TASKS  "tasks.c"
 
@@ -27,5 +29,4 @@
 
 void task_example1(void)
 {
-    ESP_LOGI(LOG_TAG_TASKS, "This is tasks.c file \r\n");
 }
