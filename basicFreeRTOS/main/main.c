@@ -11,6 +11,7 @@
 #include "queue.h"
 #include "event_groups.h"
 #include "timer.h"
+#include "high_timer.h"
 
 #define ESP_LOG_TAG     "main.c"
 
@@ -50,7 +51,9 @@ void app_main(void)
     // semaphore_example1();
     // queue_example1();
     // event_groups_example1();
-    rtos_timer_example1();
+    // rtos_timer_example1();
+    high_res_timer_example();
+
     ESP_LOGI(ESP_LOG_TAG, "Running main loop");        
     while(1)
     {
