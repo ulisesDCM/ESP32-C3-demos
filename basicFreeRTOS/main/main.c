@@ -10,6 +10,7 @@
 #include "semaphore.h"
 #include "queue.h"
 #include "event_groups.h"
+#include "timer.h"
 
 #define ESP_LOG_TAG     "main.c"
 
@@ -48,8 +49,8 @@ void app_main(void)
     // mutex_example1();
     // semaphore_example1();
     // queue_example1();
-    event_groups_example1();
-    
+    // event_groups_example1();
+    rtos_timer_example1();
     ESP_LOGI(ESP_LOG_TAG, "Running main loop");        
     while(1)
     {
