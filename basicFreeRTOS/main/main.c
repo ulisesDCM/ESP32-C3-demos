@@ -1,16 +1,20 @@
 #include <stdio.h>
 
-#include "tasks.h"
-
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+
+#include "tasks.h"
+#include "notifications.h"
+
 
 #define ESP_LOG_TAG     "main.c"
 
 void app_main(void) 
 {
-    task_example1();
+    // task_example1();     //uncomment this line to run the task example
+    tasks_notifications_example1(); //uncomment this line to run the task notification example.
+
     while(1)
     {
         ESP_LOGI(ESP_LOG_TAG, "Running main loop");        
