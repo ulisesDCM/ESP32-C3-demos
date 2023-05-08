@@ -1,9 +1,11 @@
 #include <stdio.h>
 
-#include "gpioOutput.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "esp_log.h"
+
+#include "gpioOutput.h"
+#include "gpioInput.h"
 
 #define MAIN_LOG_TAG    ("main.c")
 
