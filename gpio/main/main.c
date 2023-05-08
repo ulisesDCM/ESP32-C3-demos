@@ -17,11 +17,10 @@ void app_main(void)
 
     //Input switch config
     input_switch_configure();
-
+    create_switch_task();
+    
     while(1)
     {
-        ESP_LOGI(MAIN_LOG_TAG, "Switch 0 state: %d",get_switch_state(SWITCH0));
-        ESP_LOGI(MAIN_LOG_TAG, "Switch 1 state: %d",get_switch_state(SWITCH1));
         vTaskDelay(1000/portTICK_PERIOD_MS);
     }
 }

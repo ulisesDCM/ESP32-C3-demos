@@ -2,6 +2,8 @@
 
 #include "esp_log.h"
 #include "driver/gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
 
 #define LOG_TAG     ("gpioInput.c")
 
@@ -21,4 +23,19 @@ void input_switch_configure(void)
 int get_switch_state(eSWITCH sw)
 {
     return gpio_get_level(sw);    
+}
+
+static void switch_task(void *params)
+{
+    while(1)
+    {
+        ESP_LOGI(LOG_TAG, "Switch 0 state: %d", get_switch_state(SWITCH0));
+        ESP_LOGI(LOG_TAG, "Switch 1 state: %d", get_switch_state(SWITCH1));
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+}
+
+void create_switch_task(void)
+{
+    xTaskCreate(&switch_task, "switch 0 and 1 task", 1024*2, NULL, 3, NULL);
 }

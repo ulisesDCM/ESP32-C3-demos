@@ -15,5 +15,6 @@ typedef enum
 
 void input_switch_configure(void);
 int get_switch_state(eSWITCH sw);
+void create_switch_task(void);
 
 #endif
