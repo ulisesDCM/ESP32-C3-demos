@@ -7,6 +7,13 @@
 #define SWITCH1_PIN_MASK    (1<<SWITCH1_PIN)
 #define SWITCH_BIT_MASK     (SWITCH0_PIN_MASK | SWITCH1_PIN_MASK)
 
+typedef enum
+{
+    SWITCH0=SWITCH0_PIN,
+    SWITCH1=SWITCH1_PIN
+}eSWITCH;
+
 void input_switch_configure(void);
+int get_switch_state(eSWITCH sw);
 
 #endif

@@ -18,3 +18,7 @@ void input_switch_configure(void)
     gpio_config(&switch_conf);
 }
 
+int get_switch_state(eSWITCH sw)
+{
+    return gpio_get_level(sw);    
+}
