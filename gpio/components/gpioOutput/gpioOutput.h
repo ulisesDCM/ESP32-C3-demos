@@ -15,4 +15,6 @@ typedef enum
 
 void gpio_output_config(void);
 void set_led_state(eLED led, int state);
+void led_toogle_create_task(void);
+
 #endif
