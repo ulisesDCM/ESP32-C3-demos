@@ -15,9 +15,16 @@ const gpio_config_t int_config = {
     .intr_type=GPIO_INTR_POSEDGE
 };
 
+static void IRAM_ATTR gpio_isr_handler(void *args)
+{
+    ESP_LOGI(LOG_TAG, "Running GPIO ISR of pin %d",INPUT_INT_PIN);
+}
+
 void gpio_int_config(void)
 {
     ESP_LOGI(LOG_TAG, "Initialize the %d pin to be an interrupt",INPUT_INT_PIN);
     
+    gpio_install_isr_service(0);
+    gpio_isr_handler_add(INPUT_INT_PIN, gpio_isr_handler, (void *) INPUT_INT_PIN);
 }
 
