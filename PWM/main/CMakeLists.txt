@@ -1,2 +1,10 @@
-idf_component_register(SRCS "main.c"
-                    INCLUDE_DIRS ".")
+idf_component_register(
+    SRCS 
+        "main.c"
+        "PWM/pwm.c"
+    INCLUDE_DIRS 
+        "."
+        "PWM"
+    REQUIRES
+        "driver"
+    )
