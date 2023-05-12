@@ -6,4 +6,6 @@ idf_component_register(
         INCLUDE_DIRS 
         "."
         "ADC"
+        REQUIRES
+        "driver"
         )
