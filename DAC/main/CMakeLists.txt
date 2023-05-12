@@ -1,2 +1,8 @@
-idf_component_register(SRCS "main.c"
-                    INCLUDE_DIRS ".")
+idf_component_register(
+    SRCS 
+    "main.c"
+    "DAC/dac.c"
+    INCLUDE_DIRS 
+    "DAC"
+    "."
+    )
