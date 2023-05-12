@@ -31,7 +31,20 @@ static void int_print_count_task(void *parms)
     {
         if(xQueueReceive(interruptQueue, &pinNumber, portMAX_DELAY))
         {
-            ESP_LOGI(LOG_TAG, "The interrupt on the pin %d was triggered",pinNumber);   
+            //Disable interrupt
+            gpio_isr_handler_remove(INPUT_INT_PIN);
+
+            //Wait some time while we check the button to be released.
+            do
+            {
+                vTaskDelay(200/portTICK_PERIOD_MS);
+            }while(gpio_get_level(INPUT_INT_PIN)==1);
+            
+            //Do some work.
+            ESP_LOGI(LOG_TAG, "The interrupt on the pin %d was triggered",pinNumber);
+
+            //Re enable the interrupt.
+            gpio_isr_handler_add(INPUT_INT_PIN, gpio_isr_handler, (void *) INPUT_INT_PIN);    
         }     
     }
     
