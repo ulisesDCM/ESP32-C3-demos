@@ -4,6 +4,7 @@
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/queue.h"
 
 #define LOG_TAG     ("gpioInterrupt.c")
 
@@ -15,16 +16,36 @@ const gpio_config_t int_config = {
     .intr_type=GPIO_INTR_POSEDGE
 };
 
-static void IRAM_ATTR gpio_isr_handler(void *args)
+QueueHandle_t interruptQueue;
+
+static void IRAM_ATTR gpio_isr_handler(void* arg)
 {
-    ESP_LOGI(LOG_TAG, "Running GPIO ISR of pin %d",INPUT_INT_PIN);
+    int pin_number = (int) arg;
+    xQueueSendFromISR(interruptQueue, &pin_number, NULL);
+}
+
+static void int_print_count_task(void *parms)
+{
+    int pinNumber = 0;
+    while (1)
+    {
+        if(xQueueReceive(interruptQueue, &pinNumber, portMAX_DELAY))
+        {
+            ESP_LOGI(LOG_TAG, "The interrupt on the pin %d was triggered",pinNumber);   
+        }     
+    }
+    
 }
 
 void gpio_int_config(void)
 {
     ESP_LOGI(LOG_TAG, "Initialize the %d pin to be an interrupt",INPUT_INT_PIN);
     
+    gpio_config(&int_config);
+
+    interruptQueue = xQueueCreate(10, sizeof(int));
+    xTaskCreate(&int_print_count_task, "int task", 1024*2, NULL, 2, NULL);
+
     gpio_install_isr_service(0);
     gpio_isr_handler_add(INPUT_INT_PIN, gpio_isr_handler, (void *) INPUT_INT_PIN);
 }
-
