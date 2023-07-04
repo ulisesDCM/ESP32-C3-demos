@@ -16,6 +16,7 @@ void app_main(void)
         .flow_ctrl=UART_HW_FLOWCTRL_DISABLE,
         .parity=UART_PARITY_DISABLE,
         .stop_bits=UART_STOP_BITS_1,
+        .source_clk=UART_SCLK_DEFAULT
     };
 
     uart_param_config(UART_NUM_1, &uart_config);
@@ -28,9 +29,12 @@ void app_main(void)
 
     uart_driver_install(UART_NUM_1, RX_BUF_SIZE, 0, 0, NULL, 0);
 
-    char message[] = "ping";
-    printf("sending %s\n",message);
-    uart_write_bytes(UART_NUM_1, message, sizeof(message));
+    char message[] = "Hello World!!!\r\n";
+    while(1){
+        printf("sending %s",message);
+        uart_write_bytes(UART_NUM_1, message, sizeof(message));
+        vTaskDelay(pdMS_TO_TICKS(500));
+    }
 
     char incomming_message[RX_BUF_SIZE];
     memset(incomming_message, 0, sizeof(incomming_message));
