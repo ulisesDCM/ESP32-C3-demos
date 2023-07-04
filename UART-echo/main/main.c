@@ -30,15 +30,13 @@ void app_main(void)
     uart_driver_install(UART_NUM_1, RX_BUF_SIZE, 0, 0, NULL, 0);
 
     char message[] = "Hello World!!!\r\n";
-    while(1){
-        printf("sending %s",message);
-        uart_write_bytes(UART_NUM_1, message, sizeof(message));
-        vTaskDelay(pdMS_TO_TICKS(500));
-    }
+    printf("sending %s",message);
+    uart_write_bytes(UART_NUM_1, message, sizeof(message));
+    vTaskDelay(pdMS_TO_TICKS(500));
 
     char incomming_message[RX_BUF_SIZE];
     memset(incomming_message, 0, sizeof(incomming_message));
     uart_read_bytes(UART_NUM_1, incomming_message, RX_BUF_SIZE, pdMS_TO_TICKS(500));
     printf("received: %s\n",incomming_message);
-    
+        
 }
