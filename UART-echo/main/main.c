@@ -34,9 +34,11 @@ void app_main(void)
     uart_write_bytes(UART_NUM_1, message, sizeof(message));
     vTaskDelay(pdMS_TO_TICKS(500));
 
-    char incomming_message[RX_BUF_SIZE];
-    memset(incomming_message, 0, sizeof(incomming_message));
-    uart_read_bytes(UART_NUM_1, incomming_message, RX_BUF_SIZE, pdMS_TO_TICKS(500));
-    printf("received: %s\n",incomming_message);
-        
+    while(1){
+        char incomming_message[RX_BUF_SIZE];
+        memset(incomming_message, 0, sizeof(incomming_message));
+        uart_read_bytes(UART_NUM_1, incomming_message, RX_BUF_SIZE, pdMS_TO_TICKS(500));
+        printf("received: %s\n",incomming_message);
+    }
+
 }
