@@ -3,8 +3,8 @@
 #include "driver/uart.h"
 #include <string.h>
 
-#define TXD_PIN 4
-#define RXD_PIN 5
+#define TXD_PIN 0
+#define RXD_PIN 1   
 
 #define RX_BUF_SIZE     254
 
