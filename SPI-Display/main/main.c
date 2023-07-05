@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <u8g2.h>
-
 #include "u8g2_esp32_hal.h"
 
 #define PIN_CLK 14
