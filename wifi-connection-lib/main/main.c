@@ -15,7 +15,7 @@ void wifi_connect(void *params){
     }
 
     for(int i=5;i>0;i--){
-        ESP_LOGI(MAIN_LOG_TAG, "Disconnecting in %d\n",i);
+        ESP_LOGI(MAIN_LOG_TAG, "Disconnecting in %d",i);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
