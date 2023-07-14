@@ -74,7 +74,7 @@ void event_handler(void* event_handler_arg, esp_event_base_t event_base, int32_t
             xEventGroupSetBits(wifi_events, DISCONNECTED);
             break;
         }
-        char *err = get_error(wifi_event_sta_disconnected->reason);
+        const char *err = get_error(wifi_event_sta_disconnected->reason);
         ESP_LOGE(CONNECT_LOG_TAG, "Disconnected: %s",err);
         esp_wifi_connect();
         // xEventGroupSetBits(wifi_events, DISCONNECTED);
@@ -85,6 +85,13 @@ void event_handler(void* event_handler_arg, esp_event_base_t event_base, int32_t
         xEventGroupSetBits(wifi_events, CONNECT_GOT_IP);
         break;
     
+    case WIFI_EVENT_AP_START:
+        ESP_LOGI(CONNECT_LOG_TAG, "AP started");
+        break;
+    
+    case WIFI_EVENT_AP_STOP:
+        ESP_LOGI(CONNECT_LOG_TAG, "AP stopped");
+        break;
     default:
         break;
     }
@@ -124,7 +131,19 @@ esp_err_t wifi_connect_sta(const char *ssid, const char *pass, int timeout){
 }
 
 void wifi_connect_ap(const char *ssid, const char *pass){
-
+    wifi_events = xEventGroupCreate();
+    esp_netif = esp_netif_create_default_wifi_ap();
+    
+    wifi_config_t wifi_config;
+    memset(&wifi_config, 0, sizeof(wifi_config));
+    strncpy((char *)wifi_config.ap.ssid, ssid, sizeof(wifi_config.ap.ssid)-1);
+    strncpy((char *)wifi_config.ap.password, pass, sizeof(wifi_config.ap.password)-1);
+    wifi_config.ap.authmode=WIFI_AUTH_WPA_WPA2_PSK;
+    wifi_config.ap.max_connection=4;
+        
+    esp_wifi_set_mode(WIFI_MODE_AP);
+    esp_wifi_set_config(ESP_IF_WIFI_AP, &wifi_config);
+    esp_wifi_start();   
 }
 
 void wifi_disconnect(void){

@@ -7,7 +7,16 @@
 
 #define MAIN_LOG_TAG        ("main.c")
 
-void wifi_connect(void *params){
+void wifi_connect(void *params){    
+    /* Setting up the access point  */
+    wifi_connect_ap("my-esp-ssid","password");
+    for(int i=45;i>0;i--){
+        ESP_LOGI(MAIN_LOG_TAG, "Disconnecting ap in %d",i);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    }
+    wifi_disconnect();
+
+    /* Setting up the internet connection through wifi */
     esp_err_t err=wifi_connect_sta("IZZI-EC7D", "Taquitos9.",10000);
     if(err){
         ESP_LOGI(MAIN_LOG_TAG, "Failed to connect");
@@ -15,7 +24,7 @@ void wifi_connect(void *params){
     }
 
     for(int i=5;i>0;i--){
-        ESP_LOGI(MAIN_LOG_TAG, "Disconnecting in %d",i);
+        ESP_LOGI(MAIN_LOG_TAG, "Disconnecting sta in %d",i);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 
