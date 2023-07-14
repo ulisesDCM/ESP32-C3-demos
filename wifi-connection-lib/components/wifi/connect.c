@@ -4,11 +4,18 @@
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "freertos/event_groups.h"
 #include "esp_netif.h"
 #include "esp_wifi.h"
 
 #define CONNECT_LOG_TAG     ("connect.c")
+
 esp_netif_t *esp_netif;
+
+static EventGroupHandle_t wifi_events;
+static const int CONNECT_GOT_IP = BIT0;
+static const int DISCONNECTED = BIT1;
+
 
 void event_handler(void* event_handler_arg, esp_event_base_t event_base, int32_t event_id, 
                     void* event_data){
@@ -24,10 +31,12 @@ void event_handler(void* event_handler_arg, esp_event_base_t event_base, int32_t
 
     case WIFI_EVENT_STA_DISCONNECTED:
         ESP_LOGI(CONNECT_LOG_TAG, "disconnected...");
+        xEventGroupSetBits(wifi_events, DISCONNECTED);
         break;
 
     case IP_EVENT_STA_GOT_IP:
         ESP_LOGI(CONNECT_LOG_TAG, "got ip");
+        xEventGroupSetBits(wifi_events, CONNECT_GOT_IP);
         break;
     
     default:
@@ -47,6 +56,7 @@ void wifi_init(void){
 }
 
 esp_err_t wifi_connect_sta(const char *ssid, const char *pass, int timeout){
+    wifi_events = xEventGroupCreate();
     esp_netif = esp_netif_create_default_wifi_sta();
     
     wifi_config_t wifi_config;
@@ -57,7 +67,14 @@ esp_err_t wifi_connect_sta(const char *ssid, const char *pass, int timeout){
     esp_wifi_set_mode(WIFI_MODE_STA);
     esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config);
     esp_wifi_start();   
-    return  ESP_OK; 
+
+    EventBits_t result=xEventGroupWaitBits(wifi_events, CONNECT_GOT_IP|DISCONNECTED, pdTRUE,
+                                        pdFALSE, pdMS_TO_TICKS(timeout));
+    if(result==CONNECT_GOT_IP){
+        return ESP_OK;
+    }else{
+        return ESP_FAIL;
+    }
 }
 
 void wifi_connect_ap(const char *ssid, const char *pass){
@@ -65,5 +82,6 @@ void wifi_connect_ap(const char *ssid, const char *pass){
 }
 
 void wifi_disconnect(void){
-
+    esp_wifi_disconnect();
+    esp_wifi_stop();
 }

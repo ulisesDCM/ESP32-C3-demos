@@ -8,7 +8,7 @@
 #define MAIN_LOG_TAG        ("main.c")
 
 void wifi_connect(void *params){
-    esp_err_t err=wifi_connect_sta("IZZI-EC7D", "Taquitos9.",1000);
+    esp_err_t err=wifi_connect_sta("IZZI-EC7D", "Taquitos9.",10000);
     if(err){
         ESP_LOGI(MAIN_LOG_TAG, "Failed to connect");
         vTaskDelete(NULL);
