@@ -8,6 +8,7 @@
 #include "esp_wifi.h"
 
 #define CONNECT_LOG_TAG     ("connect.c")
+esp_netif_t *esp_netif;
 
 void event_handler(void* event_handler_arg, esp_event_base_t event_base, int32_t event_id, 
                     void* event_data){
@@ -46,7 +47,16 @@ void wifi_init(void){
 }
 
 esp_err_t wifi_connect_sta(const char *ssid, const char *pass, int timeout){
+    esp_netif = esp_netif_create_default_wifi_sta();
+    
+    wifi_config_t wifi_config;
+    memset(&wifi_config, 0, sizeof(wifi_config));
+    strncpy((char *)wifi_config.sta.ssid, ssid, sizeof(wifi_config.sta.ssid)-1);
+    strncpy((char *)wifi_config.sta.password, pass, sizeof(wifi_config.sta.password)-1);
 
+    esp_wifi_set_mode(WIFI_MODE_STA);
+    esp_wifi_set_config(ESP_IF_WIFI_STA, &wifi_config);
+    esp_wifi_start();   
     return  ESP_OK; 
 }
 
