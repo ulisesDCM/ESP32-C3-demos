@@ -3,6 +3,8 @@
 #include "esp_http_client.h"
 #include "esp_log.h"
 #include "nvs_flash.h"
+#include <string.h>
+
 
 #define MAIN_LOG_TAG        ("main.c")
 
@@ -30,8 +32,22 @@ esp_err_t on_event_client(esp_http_client_event_t *evt){
         break;       /*!< Occurs when receiving each header sent from the server */
         
         case (HTTP_EVENT_ON_DATA):
-            ESP_LOGI(MAIN_LOG_TAG, "Length =%d",evt->data_len);
-            printf("%.*s\n",evt->data_len, (char *) evt->data);
+            // ESP_LOGI(MAIN_LOG_TAG, "Length =%d",evt->data_len);
+            // printf("%.*s\n",evt->data_len, (char *) evt->data);
+        // ESP_LOGI(TAG, "Length=%d", evt->data_len);
+        // printf("%.*s\n", evt->data_len, (char *)evt->data);
+        chunk_payload_t *chunk_payload = evt->user_data;
+        chunk_payload->buffer = realloc(chunk_payload->buffer
+                                ,chunk_payload->buffer_index + evt->data_len + 1);
+        memcpy(&chunk_payload->buffer[chunk_payload->buffer_index],
+                    (uint8_t *) evt->data, 
+                    evt->data_len );
+        chunk_payload->buffer_index = chunk_payload->buffer_index + evt->data_len;
+        chunk_payload->buffer[chunk_payload->buffer_index] = 0;
+        printf("buffer******** %s\n",chunk_payload->buffer);
+
+
+
         break;         /*!< Occurs when receiving data from the server, possibly multiple portions of the packet */
         
         case (HTTP_EVENT_ON_FINISH):
@@ -56,20 +72,25 @@ void fetch_quote(void){
     chunk_payload_t chunk_payload ={0};
 
     esp_http_client_config_t http_config = {
-        .url="http://www.google.com",
+        .url="http://quotes.rest/qod",
         .method=HTTP_METHOD_GET,
         .event_handler=on_event_client,
+        .user_data=&chunk_payload
         };
     esp_http_client_handle_t client = esp_http_client_init(&http_config);
     esp_http_client_set_header(client,"Content-Type","application/json");
     esp_err_t error = esp_http_client_perform(client);
     if(error==ESP_OK){
-        ESP_LOGI(MAIN_LOG_TAG, "HTTP GET status = %d, content_length = %d",
+        ESP_LOGI(MAIN_LOG_TAG, "HTTP GET status = %d, result = %s",
             (int) esp_http_client_get_status_code(client),
-            (int) esp_http_client_get_content_length(client));
+            chunk_payload.buffer);
     }else{
         ESP_LOGE(MAIN_LOG_TAG, "HTTP GET request failed: %s",esp_err_to_name(error));
     }
+    
+    if(chunk_payload.buffer != NULL)
+        free(chunk_payload.buffer);
+
     esp_http_client_cleanup(client);
     wifi_disconnect();
 }
