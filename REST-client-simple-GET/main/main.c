@@ -6,6 +6,11 @@
 
 #define MAIN_LOG_TAG        ("main.c")
 
+typedef struct chunk_payload_t{
+    uint8_t *buffer;
+    int buffer_index;
+}chunk_payload_t;
+
 esp_err_t on_event_client(esp_http_client_event_t *evt){
     switch(evt->event_id){
         case (HTTP_EVENT_ERROR):
@@ -48,6 +53,8 @@ esp_err_t on_event_client(esp_http_client_event_t *evt){
 }
 
 void fetch_quote(void){
+    chunk_payload_t chunk_payload ={0};
+
     esp_http_client_config_t http_config = {
         .url="http://www.google.com",
         .method=HTTP_METHOD_GET,
