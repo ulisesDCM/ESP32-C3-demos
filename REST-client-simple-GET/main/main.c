@@ -5,6 +5,8 @@
 #include "nvs_flash.h"
 #include <string.h>
 
+#include "parse_weather.h"
+
 /* Free API for weather: https://open-meteo.com/ */
 
 #define MAIN_LOG_TAG        ("main.c")
@@ -85,9 +87,9 @@ void fetch_quote(void){
 
     esp_err_t error = esp_http_client_perform(client);
     if(error==ESP_OK){
-        ESP_LOGI(MAIN_LOG_TAG, "HTTP GET status = %d, result = %s",
-            (int) esp_http_client_get_status_code(client),
-            chunk_payload.buffer);
+        ESP_LOGI(MAIN_LOG_TAG, "HTTP GET status = %d",
+                (int) esp_http_client_get_status_code(client));
+        parse_weather((char *) chunk_payload.buffer);
     }else{
         ESP_LOGE(MAIN_LOG_TAG, "HTTP GET request failed: %s",esp_err_to_name(error));
     }
