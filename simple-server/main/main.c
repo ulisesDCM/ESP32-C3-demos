@@ -8,5 +8,7 @@
 
 void app_main(void)
 {
-    ESP_LOGI(LOG_TAG,"Hello world!!!");
+    ESP_ERROR_CHECK(nvs_flash_init());
+    wifi_init();
+    ESP_ERROR_CHECK(wifi_connect_sta("IZZI-EC7D","Taquitos9.",1000));
 }
