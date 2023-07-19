@@ -5,9 +5,11 @@
 #include "nvs_flash.h"
 #include <string.h>
 
+/* Free API for weather: https://open-meteo.com/ */
 
 #define MAIN_LOG_TAG        ("main.c")
-
+extern const uint8_t cert[] asm("_binary_re_cer_start");
+// extern const uint8_t cert[] asm("_binary_amazon_cer_start");
 typedef struct chunk_payload_t{
     uint8_t *buffer;
     int buffer_index;
@@ -44,10 +46,7 @@ esp_err_t on_event_client(esp_http_client_event_t *evt){
                     evt->data_len );
         chunk_payload->buffer_index = chunk_payload->buffer_index + evt->data_len;
         chunk_payload->buffer[chunk_payload->buffer_index] = 0;
-        printf("buffer******** %s\n",chunk_payload->buffer);
-
-
-
+        // printf("buffer******** %s\n",chunk_payload->buffer);
         break;         /*!< Occurs when receiving data from the server, possibly multiple portions of the packet */
         
         case (HTTP_EVENT_ON_FINISH):
@@ -72,13 +71,18 @@ void fetch_quote(void){
     chunk_payload_t chunk_payload ={0};
 
     esp_http_client_config_t http_config = {
-        .url="http://quotes.rest/qod",
+        .url="https://api.open-meteo.com/v1/forecast?latitude=32.5027&longitude=-117.0037&daily=uv_index_max&timezone=America%2FLos_Angeles",
         .method=HTTP_METHOD_GET,
         .event_handler=on_event_client,
-        .user_data=&chunk_payload
+        .user_data=&chunk_payload,
+        .cert_pem=(char *)cert
         };
     esp_http_client_handle_t client = esp_http_client_init(&http_config);
-    esp_http_client_set_header(client,"Content-Type","application/json");
+    // esp_http_client_set_header(client,"latitude","32.5027");
+    // esp_http_client_set_header(client,"longitude","-117.0037");
+    // esp_http_client_set_header(client,"daily","uv_index_max");
+    // esp_http_client_set_header(client,"timezone","America%2FLos_Angeles");
+
     esp_err_t error = esp_http_client_perform(client);
     if(error==ESP_OK){
         ESP_LOGI(MAIN_LOG_TAG, "HTTP GET status = %d, result = %s",
