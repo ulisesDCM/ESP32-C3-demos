@@ -3,6 +3,7 @@
 #include "nvs_flash.h"
 #include "esp_log.h"
 #include "esp_http_server.h"
+#include "mdns.h"
 
 #define LOG_TAG     ("main.c")
 
@@ -25,6 +26,10 @@ static void init_server(void){
     };
 
     httpd_register_uri_handler(server, &default_url);
+}
+
+void start_mdns_server(void){
+    // mdns_init();
 }
 
 void app_main(void)
