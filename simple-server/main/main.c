@@ -29,7 +29,9 @@ static void init_server(void){
 }
 
 void start_mdns_server(void){
-    // mdns_init();
+    ESP_ERROR_CHECK(mdns_init());
+    mdns_hostname_set("my-esp32");
+    mdns_instance_name_set("ESP32 micro-server");
 }
 
 void app_main(void)
@@ -37,5 +39,7 @@ void app_main(void)
     ESP_ERROR_CHECK(nvs_flash_init());
     wifi_init();
     ESP_ERROR_CHECK(wifi_connect_sta("IZZI-EC7D","Taquitos9.",1000*10));
+
+    start_mdns_server();
     init_server();
 }
