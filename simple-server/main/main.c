@@ -15,6 +15,14 @@ static  esp_err_t on_default_url(httpd_req_t *r){
     return ESP_OK;
 }
 
+
+static  esp_err_t on_toogle_led(httpd_req_t *r){
+    // ESP_LOGI(LOG_TAG,"URL: %s",r->uri);
+    // httpd_resp_sendstr(r,"hello World");
+
+    return ESP_OK;
+}
+
 static void init_server(void){
     httpd_handle_t server=NULL;
     httpd_config_t config=HTTPD_DEFAULT_CONFIG();
@@ -25,8 +33,15 @@ static void init_server(void){
         .method=HTTP_GET,
         .handler=on_default_url
     };
-
     httpd_register_uri_handler(server, &default_url);
+
+    httpd_uri_t toogle_led_url={
+        .uri="/api/toogle-led",
+        .method=HTTP_POST,
+        .handler=on_toogle_led
+    };
+
+    httpd_register_uri_handler(server, &toogle_led_url);
 }
 
 void start_mdns_server(void){
@@ -38,6 +53,7 @@ void start_mdns_server(void){
 void app_main(void)
 {
     ESP_ERROR_CHECK(nvs_flash_init());
+    init_led();
     wifi_init();
     ESP_ERROR_CHECK(wifi_connect_sta("IZZI-EC7D","Taquitos9.",1000*10));
 
