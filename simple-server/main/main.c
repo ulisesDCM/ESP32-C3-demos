@@ -5,6 +5,7 @@
 #include "esp_http_server.h"
 #include "mdns.h"
 #include "toogleLED.h"
+#include "cJSON.h"
 
 #define LOG_TAG     ("main.c")
 
@@ -17,9 +18,17 @@ static  esp_err_t on_default_url(httpd_req_t *r){
 
 
 static  esp_err_t on_toogle_led(httpd_req_t *r){
-    // ESP_LOGI(LOG_TAG,"URL: %s",r->uri);
-    // httpd_resp_sendstr(r,"hello World");
+    char buffer[100];
+    memset(buffer,0,sizeof(buffer));
+    httpd_req_recv(r, buffer, r->content_len);
+    cJSON *payload=cJSON_Parse(buffer);
+    cJSON *is_on_json=cJSON_GetObjectItem(payload, "is_on");
+    bool is_on = cJSON_IsTrue(is_on_json);
+    cJSON_Delete(payload);
+    toogle_led(is_on);
 
+    httpd_resp_set_status(r,"204 NO CONTENT");
+    httpd_resp_send(r, NULL, 0);
     return ESP_OK;
 }
 
