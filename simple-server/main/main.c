@@ -25,6 +25,8 @@ static  esp_err_t on_toogle_led(httpd_req_t *r){
     cJSON *is_on_json=cJSON_GetObjectItem(payload, "is_on");
     bool is_on = cJSON_IsTrue(is_on_json);
     cJSON_Delete(payload);
+
+    ESP_LOGI(LOG_TAG, "set the LED status to: %d",is_on);
     toogle_led(is_on);
 
     httpd_resp_set_status(r,"204 NO CONTENT");
