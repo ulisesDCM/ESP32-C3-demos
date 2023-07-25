@@ -35,10 +35,35 @@ static  esp_err_t on_toogle_led(httpd_req_t *r){
     httpd_resp_send(r, NULL, 0);
     return ESP_OK;
 }
+/* ****************** web socket *******************/
+#define WS_MAX_SIZE         (1024)
+static int client_section_id;
 
 static  esp_err_t on_web_socket_url(httpd_req_t *r){
-    return ESP_OK;
+    client_section_id=httpd_req_to_sockfd(r);
+    if(r->method == HTTP_GET) return ESP_OK;
+    
+    httpd_ws_frame_t ws_pkt;
+    memset(&ws_pkt,0,sizeof(httpd_ws_frame_t));
+    ws_pkt.type=HTTPD_WS_TYPE_TEXT;
+    ws_pkt.payload=malloc(WS_MAX_SIZE);
+    httpd_ws_recv_frame(r, &ws_pkt, WS_MAX_SIZE);
+    ESP_LOGI(LOG_TAG,"ws payload %.*s",ws_pkt.len, ws_pkt.payload);
+    free(ws_pkt.payload);
+
+    char *response="connected OK";
+    httpd_ws_frame_t ws_response={
+        .final=true,
+        .fragmented=false,
+        .type=HTTPD_WS_TYPE_TEXT,
+        .payload=(uint8_t *)response,
+        .len=strlen(response)
+    };
+    
+    return httpd_ws_send_frame(r, &ws_response);
 }
+
+/* ****************** ********** *******************/
 
 static void init_server(void){
     httpd_handle_t server=NULL;
