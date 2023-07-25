@@ -12,8 +12,15 @@
 #define PUSH_BUTTON_PIN     (GPIO_NUM_3)
 #define PUSH_BUTTON_MASK    (1<<PUSH_BUTTON_PIN)
 
+static SemaphoreHandle_t btn_sem;
 
 static void IRAM_ATTR on_button_pushed(void *arg){
+    xSemaphoreGiveFromISR(btn_sem, NULL);
+}
+
+static void btn_push_task(void *params){
+    while (1){
+    }
 }
 
 const gpio_config_t button_config = {
@@ -25,6 +32,8 @@ const gpio_config_t button_config = {
 };
 
 void init_button(void){
+    btn_sem=xSemaphoreCreateBinary();
+    xTaskCreate(btn_push_task, "btn_push_task", 1024*2, NULL, 5, NULL);
     ESP_ERROR_CHECK(gpio_reset_pin(PUSH_BUTTON_PIN));
     ESP_ERROR_CHECK(gpio_config(&button_config));
 
