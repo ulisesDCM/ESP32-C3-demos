@@ -8,6 +8,7 @@
 #include "freertos/semphr.h"
 #include "freertos/task.h"
 #include "cJSON.h"
+#include "app.h"
 
 #define LOG_TAG             ("pushbutton.c")
 #define PUSH_BUTTON_PIN     (GPIO_NUM_3)
@@ -34,7 +35,7 @@ static void btn_push_task(void *params){
         cJSON_AddBoolToObject(payload, "btn_state",gpio_get_level(PUSH_BUTTON_PIN));
         char *message=cJSON_Print(payload);
         ESP_LOGI(LOG_TAG, "message: %s",message);
-        
+        send_ws_message(message);        
         cJSON_Delete(payload);
         free(message);
     }
