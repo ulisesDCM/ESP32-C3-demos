@@ -1,3 +1,3 @@
-idf_component_register(SRCS "toogleLED.c" "main.c"
+idf_component_register(SRCS "pushButton.c" "toogleLED.c" "main.c"
                     INCLUDE_DIRS "."
                     )
