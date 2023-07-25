@@ -67,6 +67,7 @@ void app_main(void)
 {
     ESP_ERROR_CHECK(nvs_flash_init());
     init_led();
+    init_button();
     wifi_init();
     ESP_ERROR_CHECK(wifi_connect_sta("IZZI-EC7D","Taquitos9.",1000*10));
 
