@@ -8,8 +8,11 @@
 #include "cJSON.h"
 #include "pushButton.h"
 #include "esp_spiffs.h"
+#include "esp_wifi.h"
 
 #define LOG_TAG     ("main.c")
+#define MAX_APs     (20)
+
 static httpd_handle_t server=NULL;
 
 static  esp_err_t on_default_url(httpd_req_t *r){
@@ -84,6 +87,39 @@ static  esp_err_t on_toogle_led(httpd_req_t *r){
     httpd_resp_send(r, NULL, 0);
     return ESP_OK;
 }
+
+static esp_err_t on_get_ap_url(httpd_req_t *r){
+    esp_wifi_set_mode(WIFI_MODE_APSTA);
+    wifi_scan_config_t wifi_scan_config = {
+        .bssid=0,
+        .ssid=0,
+        .channel=0,
+        .show_hidden=true
+    };
+    
+    esp_wifi_scan_start(&wifi_scan_config, true);
+    
+    wifi_ap_record_t wifi_ap_record[MAX_APs];
+    uint16_t ap_count=MAX_APs;
+    esp_wifi_scan_get_ap_records(&ap_count, wifi_ap_record);
+
+    cJSON *wifi_scan_json = cJSON_CreateArray();
+    for(size_t i=0; i<ap_count;i++){
+        cJSON *element = cJSON_CreateObject(); 
+        cJSON_AddStringToObject(element, "ssid", (char *)wifi_ap_record[i].ssid);
+        cJSON_AddNumberToObject(element, "rssi", wifi_ap_record[i].rssi);
+        cJSON_AddItemToArray(wifi_scan_json, element);
+    }
+
+    char *json_string = cJSON_Print(wifi_scan_json);
+    httpd_resp_set_type(r, "application/json");
+    httpd_resp_sendstr(r, json_string);
+
+    cJSON_Delete(wifi_scan_json);
+    free(json_string);
+    return ESP_OK;
+}   
+
 /* ****************** web socket *******************/
 #define WS_MAX_SIZE         (1024)
 static int client_section_id;
@@ -130,7 +166,7 @@ static  esp_err_t on_web_socket_url(httpd_req_t *r){
     return httpd_ws_send_frame(r, &ws_response);
 }
 
-/* ****************** ********** *******************/
+/* ****************** web socket END *******************/
 
 static void init_server(void){
     httpd_config_t config=HTTPD_DEFAULT_CONFIG();
@@ -138,6 +174,12 @@ static void init_server(void){
 
     ESP_ERROR_CHECK(httpd_start(&server, &config));
 
+    httpd_uri_t get_ap_list_url={
+        .uri="/api/get-ap-list",
+        .method=HTTP_GET,
+        .handler=on_get_ap_url,
+    };
+    httpd_register_uri_handler(server, &get_ap_list_url);
 
     /* Defining default URL to toogle an LED using POST */
     httpd_uri_t toogle_led_url={
