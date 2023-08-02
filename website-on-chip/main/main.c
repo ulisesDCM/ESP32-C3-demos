@@ -7,14 +7,47 @@
 #include "toogleLED.h"
 #include "cJSON.h"
 #include "pushButton.h"
+#include "esp_spiffs.h"
 
 #define LOG_TAG     ("main.c")
 static httpd_handle_t server=NULL;
 
 static  esp_err_t on_default_url(httpd_req_t *r){
     ESP_LOGI(LOG_TAG,"URL: %s",r->uri);
-    httpd_resp_sendstr(r,"hello World");
+    // httpd_resp_sendstr(r,"hello World");
 
+    esp_vfs_spiffs_conf_t esp_vfs_spiffs_conf = {
+        .base_path="/spiffs",
+        .partition_label=NULL,
+        .max_files=5,
+        .format_if_mount_failed=true
+    };
+
+    esp_vfs_spiffs_register(&esp_vfs_spiffs_conf);
+
+    char path[1024];
+    if(strcmp(r->uri, "/") == 0){
+        strcpy(path,"/spiffs/index.html");
+    }
+
+    ESP_LOGI(LOG_TAG, "The path is :%s",path);
+    //Handle other files
+
+    FILE *file = fopen(path,"r");
+    if(file==NULL){
+        httpd_resp_send_404(r);
+        esp_vfs_spiffs_unregister(NULL);
+        return ESP_OK;
+    }
+
+    char lineRead[256];
+    while( fgets(lineRead,sizeof(lineRead), file) ){
+        httpd_resp_sendstr_chunk(r, lineRead);
+    }
+
+    httpd_resp_sendstr_chunk(r,NULL);
+
+    esp_vfs_spiffs_unregister(NULL);
     return ESP_OK;
 }
 
