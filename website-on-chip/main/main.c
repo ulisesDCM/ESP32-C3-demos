@@ -25,12 +25,27 @@ static  esp_err_t on_default_url(httpd_req_t *r){
 
     esp_vfs_spiffs_register(&esp_vfs_spiffs_conf);
 
-    char path[1024];
+    char path[600];
     if(strcmp(r->uri, "/") == 0){
         strcpy(path,"/spiffs/index.html");
+    }else{
+        sprintf(path, "/spiffs%s",r->uri);
     }
 
-    ESP_LOGI(LOG_TAG, "The path is :%s",path);
+    char *ext = strrchr(path,'.');
+    if(strcmp(ext, ".css") == 0){
+        httpd_resp_set_type(r, "text/css");
+    }
+
+    if(strcmp(ext, ".js") == 0){
+        httpd_resp_set_type(r, "text/javascript");
+    }
+
+    if(strcmp(ext, ".png") == 0){
+        httpd_resp_set_type(r, "image/png");
+    }
+
+    // ESP_LOGI(LOG_TAG, "The path is :%s",path);
     //Handle other files
 
     FILE *file = fopen(path,"r");
@@ -119,15 +134,10 @@ static  esp_err_t on_web_socket_url(httpd_req_t *r){
 
 static void init_server(void){
     httpd_config_t config=HTTPD_DEFAULT_CONFIG();
+    config.uri_match_fn = httpd_uri_match_wildcard;
+
     ESP_ERROR_CHECK(httpd_start(&server, &config));
 
-    /* Defining default URL to publish a hello worl message using GET */
-    httpd_uri_t default_url={
-        .uri="/",
-        .method=HTTP_GET,
-        .handler=on_default_url
-    };
-    httpd_register_uri_handler(server, &default_url);
 
     /* Defining default URL to toogle an LED using POST */
     httpd_uri_t toogle_led_url={
@@ -135,7 +145,6 @@ static void init_server(void){
         .method=HTTP_POST,
         .handler=on_toogle_led
     };
-
     httpd_register_uri_handler(server, &toogle_led_url);
 
     /* Defining default URL for the web socket using GET */
@@ -145,8 +154,15 @@ static void init_server(void){
         .handler=on_web_socket_url,
         .is_websocket=true
     };
-
     httpd_register_uri_handler(server, &web_socket_url);
+
+    /* Defining default URL to publish a hello worl message using GET */
+    httpd_uri_t default_url={
+        .uri="/*",
+        .method=HTTP_GET,
+        .handler=on_default_url
+    };
+    httpd_register_uri_handler(server, &default_url);
 
 }
 
